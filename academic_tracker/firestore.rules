@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // users/{uid}/profile/info  -> fullName, email, class, subjects
+    // users/{uid}/items/{id}    -> one task or event each
+    match /users/{uid} {
+      // Needed once, to clear profile fields an older version left here.
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      // Everything under the user: profile and items.
+      match /{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+  }
+}
